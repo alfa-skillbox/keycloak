@@ -12,9 +12,9 @@ keycloak_down.sh - стопает сервис и удаляет контейн�
 ### Генерация ключа и сертификата для tls в кейклоке 
 keycloak_certs_and_truststore_generator.sh - сгенерит нужные ключи и разложит в нужные директории:
  а) в _docker/imports/keycloak отправятся tls.crt (самоподписанный сертификат) и tls.key (приватный ключ)
- б) в authorization-code-client/src/main/resources и /client-credentials-client/src/main/resources
-отправятся одинаковые keycloak.truststore (хранилище самоподписанного сертификата) для работы с поднятым 
-на локалке кейклок через https
+ б) в authorization-code-client/src/main/resources, /client-credentials-client/src/main/resources и
+/resource-server/src/main/resources отправятся одинаковые keycloak.truststore 
+(хранилище самоподписанного сертификата) для работы с поднятым на локалке кейклок через https
 
 Внимание! перед запуском скрипта keycloak_certs_and_truststore_generator.sh 
 удалите tls.crt, tls.key и keycloak.truststore

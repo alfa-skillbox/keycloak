@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import ru.alfabank.skillbox.examples.keycloak.config.OAuth2AuthorizedClientAccessTokenExtractor;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.util.Map;
 
@@ -24,15 +25,17 @@ public class RestClientImpl implements RestClient {
     private final RestTemplate restTemplate;
     private final OAuth2AuthorizedClientAccessTokenExtractor accessTokenExtractor;
 
-    public ResponseEntity<Map<String, Map<String, Object>>> invoke(Authentication authentication, HttpServletRequest request) {
-        var accessToken = accessTokenExtractor.getToken(request, authentication);
-        log.info("Access token: {}", accessToken);
-        ResponseEntity<Map<String, Map<String, Object>>> response = restTemplate.exchange(RequestEntity
+    public ResponseEntity<Map<String, Map<String, Object>>> invoke(Authentication authentication,
+                                                                   HttpServletRequest request,
+                                                                   HttpServletResponse response) {
+        var accessToken = accessTokenExtractor.getToken(request, response, authentication);
+        ResponseEntity<Map<String, Map<String, Object>>> resourceResponse = restTemplate.exchange(RequestEntity
                         .get(URI.create("http://localhost:8083/resource-server/client-token"))
                         .header(AUTHORIZATION, "Bearer " + accessToken)
                         .accept(MediaType.APPLICATION_JSON).build(),
-                new ParameterizedTypeReference<>() {});
-        log.info("Server response: {}", response.getBody());
-        return response;
+                new ParameterizedTypeReference<>() {
+                });
+        log.info("Server response: {}", resourceResponse.getBody());
+        return resourceResponse;
     }
 }

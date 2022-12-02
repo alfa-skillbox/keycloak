@@ -4,9 +4,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 public interface RestClient {
 
-    ResponseEntity<Map<String, Map<String, Object>>> invoke(Authentication authentication, HttpServletRequest request);
+    ResponseEntity<Map<String, Map<String, Object>>> invoke(Authentication authentication,
+                                                            HttpServletRequest request,
+                                                            HttpServletResponse response);
 }

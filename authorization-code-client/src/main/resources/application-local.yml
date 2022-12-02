@@ -2,13 +2,7 @@ server:
   port: 8081
   servlet:
     session:
-      # если хранить авторизованных клиентов (OAuth2AuthorizedClients) в сессии,
-      # а время Expire токена установить больше времени сессии, то при протухании токена
-      # из сессии будет браться объект Authentication с isAuthenticated=true, все фильтры его пропустят,
-      # и в запросее на Resource-Server в хидере Authorization будет заэкспаренный токен. Поэтому надо
-      # добавить проверку на expire в фильтры. Здесь сделан простой workaround - время сессии меньше времени жизни
-      # токена. Но так лделать не надо
-      timeout: 60s
+      timeout: 600s
 
 host: 'localhost'
 
@@ -20,6 +14,7 @@ spring:
   security:
     oauth2:
       client:
+        # кладем spring.security.oauth2.client в OAuth2ClientProperties.class -> автоконфигурится ClientRegistration.class
         provider:
           keycloak:
             issuer-uri: '${keycloak.uri}/auth/realms/${keycloak.realm}'
@@ -32,6 +27,7 @@ spring:
             token-uri: '${keycloak.uri}/auth/realms/${keycloak.realm}/protocol/openid-connect/token'
             # 3. После получения токенов клиент уже авторизованно обращается на ${userinfoUri} для получения информации о пользователе
             userinfoUri: "${keycloak.uri}/auth/realms/${keycloak.realm}/protocol/openid-connect/userinfo"
+            # 4. Используется при запросе /userinfo
             user-name-attribute: 'preferred_username'
             end_session_endpoint: '${ukeycloak.uri}/auth/realms/${keycloak.realm}/protocol/openid-connect/logout'
             logout-url: '${keycloak.uri}/auth/realms/${keycloak.realm}/protocol/openid-connect/logout'
@@ -44,6 +40,9 @@ spring:
             client-secret: 'auth-code-secret'
             authorization-grant-type: 'authorization_code'
             # важно указать openid в scope, если необходимо в Spring запустить процесс по протоколу openid-connect
+            # а именно установить nonce в ссылке при формировании ${authorization-uri} в DefaultOAuth2AuthorizationRequestResolver
+            # и из OAuth2LoginAuthenticationProvider: Section 3.1.2.1 Authentication Request - https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest scope
+            # REQUIRED. OpenID Connect requests MUST contain the "openid" scope value
             scope: 'openid,resource-server-scope'
             redirect-uri: 'http://${host}:${server.port}/login/oauth2/code/keycloak'
 

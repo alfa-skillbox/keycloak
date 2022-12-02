@@ -4,10 +4,10 @@ services:
     image: jboss/keycloak:16.1.1
     container_name: keycloak-local
     environment:
-      # через эти двее сист переменные задаем учетку админа в кейклоке
+      # через эти две системные переменные задаем учетку админа в кейклоке
       KEYCLOAK_USER: 'admin'
       KEYCLOAK_PASSWORD: 'admin'
-      # прописываем тип БД кейклока. h2 - inmemory database
+      # прописываем тип БД кейклока. h2 - sql inmemory database
       DB_VENDOR: 'h2'
       # пароль для ключа tls.key, сгенерированного через keycloak_certs_and_truststore_generator.sh
       # будет использоваться кейклоком как пароль от

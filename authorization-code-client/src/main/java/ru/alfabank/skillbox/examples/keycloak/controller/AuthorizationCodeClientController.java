@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.alfabank.skillbox.examples.keycloak.restclient.RestClient;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @RestController
@@ -20,7 +21,9 @@ public class AuthorizationCodeClientController {
     private final RestClient restClient;
 
     @GetMapping("/invoke")
-    public ResponseEntity<Map<String, Map<String, Object>>> invoke(Authentication authentication, HttpServletRequest request) {
-        return restClient.invoke(authentication, request);
+    public ResponseEntity<Map<String, Map<String, Object>>> invoke(Authentication authentication,
+                                                                   HttpServletRequest request,
+                                                                   HttpServletResponse response) {
+        return restClient.invoke(authentication, request, response);
     }
 }
