@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: alfa-skillbox-keycloak-cc-client
+  profiles:
+    active: local

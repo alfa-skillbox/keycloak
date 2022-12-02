@@ -1,0 +1,31 @@
+host: 'localhost'
+server:
+  port: 8083
+# This is keycloak from docker-compose.yml
+keycloak:
+  uri: 'https://${host}:8443'
+  realm: "alfa-skillbox-keycloak"
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: '${keycloak.uri}/auth/realms/${keycloak.realm}/protocol/openid-connect/certs'
+
+clients:
+  permit:
+    authorities:
+      ac-client: "ROLE_resource-server"
+      cc-client: "SCOPE_cc-client-to-resource"
+
+logging:
+  level:
+    org.springframework: debug
+
+management:
+  endpoints:
+    loggers:
+      enabled: true
+    web:
+      exposure:
+        include: loggers, health

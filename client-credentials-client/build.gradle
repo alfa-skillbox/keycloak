@@ -1,0 +1,60 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.2'
+    id 'io.spring.dependency-management' version '1.0.12.RELEASE'
+    id 'java'
+    id "com.dorongold.task-tree" version "2.1.0"
+}
+
+group = 'ru.alfabank.skillbox.examples'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = targetCompatibility = '11'
+
+bootRun {
+    jvmArgs = ["-Djavax.net.ssl.trustStore=$truststore",
+               "-Djavax.net.ssl.trustStorePassword=$truststore_password",
+               "-Djavax.net.ssl.trustStoreType=JKS"
+//               "-Djavax.net.debug=all"
+    ]
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springCloudVersion', "2021.0.3")
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation "org.apache.commons:commons-lang3:3.12.0"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
+    compileOnly 'org.projectlombok:lombok'
+
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Unit test own dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

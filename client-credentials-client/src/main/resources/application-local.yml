@@ -1,0 +1,42 @@
+host: 'localhost'
+server:
+  port: 8082
+# This is keycloak from docker-compose.yml
+keycloak:
+  uri: 'https://${host}:8443'
+  realm: "alfa-skillbox-keycloak"
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: '${keycloak.uri}/auth/realms/${keycloak.realm}'
+            check-token-uri: '${keycloak.uri}/auth/realms/${keycloak.realm}/protocol/openid-connect/token/introspect'
+            token-uri: '${keycloak.uri}/auth/realms/${keycloak.realm}/protocol/openid-connect/token'
+            authorization-uri: '${keycloak.uri}/auth/realms/${keycloak.realm}/protocol/openid-connect/auth'
+            end_session_endpoint: '${ukeycloak.uri}/auth/realms/${keycloak.realm}/protocol/openid-connect/logout'
+            userinfoUri: "${keycloak.uri}/auth/realms/${keycloak.realm}/protocol/openid-connect/userinfo"
+            user-name-attribute: 'preferred_username'
+            logout-url: '${keycloak.uri}/auth/realms/${keycloak.realm}/protocol/openid-connect/logout'
+            logout-redirect-url: 'http://${host}:${server.port}/login'
+        registration:
+          cc-client:
+            registrationId: "cc-client"
+            provider: 'keycloak'
+            client-id: 'client-credentials-client'
+            client-secret: 'client-creds-secret'
+            scope: 'resource-server-scope'
+            authorization-grant-type: 'client_credentials'
+
+logging:
+  level:
+    org.springframework: debug
+
+management:
+  endpoints:
+    loggers:
+      enabled: true
+    web:
+      exposure:
+        include: loggers, health
