@@ -2,6 +2,7 @@ package ru.alfabank.skillbox.examples.keycloak.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -38,7 +39,7 @@ public class AuthorizationCodeClientWebSecurityConfig {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/oauth2/**", "/login/**").permitAll()
-                .anyRequest().authenticated()
+//                .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().accessDeniedHandler(new AccessDeniedHandlerImpl())
                 .and()
@@ -78,32 +79,46 @@ public class AuthorizationCodeClientWebSecurityConfig {
     }
 
     @Bean
-    public OAuth2AuthorizedClientAccessTokenExtractor accessTokenExtractor(OAuth2AuthorizedClientManager authorizedClientManager) {
+    public OAuth2AuthorizedClientAccessTokenExtractor accessTokenExtractor(
+            OAuth2AuthorizedClientManager authorizedClientManager,
+            @Value("${spring.security.oauth2.client.registration.ac-client.registrationId}") String registrationId,
+            @Value("${spring.security.oauth2.client.registration.ac-client.client-id}") String clientId) {
         return (HttpServletRequest request, HttpServletResponse response, Authentication authentication) -> {
-            var registrationId = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
-            OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId(registrationId)
-                    .principal(authentication)
+            var authorizeRequest = getAuthorizedRequest(registrationId, clientId, authentication)
                     .attributes(attrs -> {
                         attrs.put(HttpServletRequest.class.getName(), request);
                         attrs.put(HttpServletResponse.class.getName(), response);
-                    })
-                    .build();
+                    }).build();
+
             return Optional.ofNullable(authorizedClientManager.authorize(authorizeRequest))
                     .map(authorizedClient -> {
-                        String access_token = StringUtils.EMPTY;
+                        String accessToken = StringUtils.EMPTY;
                         if (authorizedClient.getRefreshToken() != null) {
                             log.info("Refresh token: {}", authorizedClient.getRefreshToken().getTokenValue());
                         }
                         if (authorizedClient.getAccessToken() != null) {
-                            access_token = authorizedClient.getAccessToken().getTokenValue();
-                            log.info("Access token: {}", access_token);
+                            accessToken = authorizedClient.getAccessToken().getTokenValue();
+                            log.info("Access token: {}", accessToken);
                             if (authorizedClient.getAccessToken().getExpiresAt() != null) {
-                                log.info("Access expired?: {}", authorizedClient.getAccessToken().getExpiresAt().isBefore(Instant.now()));
+                                log.info("Access token expired?: {}", authorizedClient.getAccessToken().getExpiresAt().isBefore(Instant.now()));
                             }
                         }
-                        return access_token;
+                        return accessToken;
                     })
                     .orElse(StringUtils.EMPTY);
         };
+    }
+
+    private OAuth2AuthorizeRequest.Builder getAuthorizedRequest(String registrationId,
+                                                                String clientId,
+                                                                Authentication authentication) {
+        return Optional.ofNullable(authentication)
+                .map(authn -> {
+                    var regId = ((OAuth2AuthenticationToken) authn).getAuthorizedClientRegistrationId();
+                    return OAuth2AuthorizeRequest.withClientRegistrationId(regId)
+                            .principal(authn);
+                })
+                .orElseGet(() -> OAuth2AuthorizeRequest.withClientRegistrationId(registrationId)
+                        .principal(clientId));
     }
 }

@@ -13,7 +13,6 @@ spring:
         provider:
           keycloak:
             issuer-uri: '${keycloak.uri}/auth/realms/${keycloak.realm}'
-            check-token-uri: '${keycloak.uri}/auth/realms/${keycloak.realm}/protocol/openid-connect/token/introspect'
             token-uri: '${keycloak.uri}/auth/realms/${keycloak.realm}/protocol/openid-connect/token'
             authorization-uri: '${keycloak.uri}/auth/realms/${keycloak.realm}/protocol/openid-connect/auth'
             end_session_endpoint: '${ukeycloak.uri}/auth/realms/${keycloak.realm}/protocol/openid-connect/logout'
@@ -27,7 +26,7 @@ spring:
             provider: 'keycloak'
             client-id: 'client-credentials-client'
             client-secret: 'client-creds-secret'
-            scope: 'resource-server-scope'
+            scope: 'cc-client-to-resource'
             authorization-grant-type: 'client_credentials'
 
 logging:
