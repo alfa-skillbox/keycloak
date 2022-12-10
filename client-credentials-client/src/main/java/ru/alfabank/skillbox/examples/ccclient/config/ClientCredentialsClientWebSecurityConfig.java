@@ -1,8 +1,7 @@
-package ru.alfabank.skillbox.examples.keycloak.config;
+package ru.alfabank.skillbox.examples.ccclient.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,8 +17,6 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -66,10 +63,8 @@ public class ClientCredentialsClientWebSecurityConfig {
 
     @Bean
     public OAuth2AuthorizedClientAccessTokenExtractor accessTokenExtractor(
-            OAuth2AuthorizedClientManager authorizedClientManager,
-            @Value("${spring.security.oauth2.client.registration.cc-client.registrationId}") String registrationId,
-            @Value("${spring.security.oauth2.client.registration.cc-client.client-id}") String clientId) {
-        return (HttpServletRequest request, HttpServletResponse response) -> {
+            OAuth2AuthorizedClientManager authorizedClientManager) {
+        return (registrationId, clientId) -> {
             OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId(registrationId)
                     .principal(clientId)
                     .build();

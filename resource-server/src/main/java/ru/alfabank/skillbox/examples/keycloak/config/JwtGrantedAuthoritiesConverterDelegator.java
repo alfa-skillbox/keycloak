@@ -12,7 +12,7 @@ import java.util.List;
 @Slf4j
 public class JwtGrantedAuthoritiesConverterDelegator implements Converter<Jwt, Collection<GrantedAuthority>> {
 
-    private List<Converter<Jwt, Collection<GrantedAuthority>>> delegates = new ArrayList<>();
+    private final List<Converter<Jwt, Collection<GrantedAuthority>>> delegates = new ArrayList<>();
 
     public void addConverter(Converter<Jwt, Collection<GrantedAuthority>> converter) {
         delegates.add(converter);

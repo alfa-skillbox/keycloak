@@ -1,4 +1,4 @@
-package ru.alfabank.skillbox.examples.keycloak.config;
+package ru.alfabank.skillbox.examples.acclient.config;
 
 import org.springframework.security.core.Authentication;
 

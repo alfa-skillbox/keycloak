@@ -1,4 +1,4 @@
-package ru.alfabank.skillbox.examples.keycloak.config;
+package ru.alfabank.skillbox.examples.acclient.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +39,6 @@ public class AuthorizationCodeClientWebSecurityConfig {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/oauth2/**", "/login/**").permitAll()
-//                .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().accessDeniedHandler(new AccessDeniedHandlerImpl())
                 .and()

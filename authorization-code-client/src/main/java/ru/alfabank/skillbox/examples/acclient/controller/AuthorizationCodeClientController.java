@@ -1,4 +1,4 @@
-package ru.alfabank.skillbox.examples.keycloak.controller;
+package ru.alfabank.skillbox.examples.acclient.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -7,7 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.alfabank.skillbox.examples.keycloak.restclient.RestClient;
+import ru.alfabank.skillbox.examples.acclient.dto.Response;
+import ru.alfabank.skillbox.examples.acclient.restclient.AuthorizationCodeRestClient;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,12 +19,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthorizationCodeClientController {
 
-    private final RestClient restClient;
+    private final AuthorizationCodeRestClient restClient;
 
     @GetMapping("/invoke")
-    public ResponseEntity<Map<String, Map<String, Object>>> invoke(Authentication authentication,
-                                                                   HttpServletRequest request,
-                                                                   HttpServletResponse response) {
-        return restClient.invoke(authentication, request, response);
+    public ResponseEntity<Response> invoke(HttpServletRequest request,
+                                           HttpServletResponse response,
+                                           Authentication authentication) {
+        return ResponseEntity.ok(restClient.invoke(request, response, authentication));
     }
 }

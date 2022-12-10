@@ -24,7 +24,7 @@ public class ResourceServerController {
     }
 
     @GetMapping("/client-token")
-    public ResponseEntity<?> ccClientToken(HttpServletRequest request) {
-        return ResponseEntity.ok(tokenInfoExtractor.make(request));
+    public ResponseEntity<?> clientToken(HttpServletRequest request) {
+        return ResponseEntity.ok(tokenInfoExtractor.get(request));
     }
 }

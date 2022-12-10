@@ -18,7 +18,7 @@ public class RequestTokenInfoExtractor {
 
     private final JwtDecoder jwtDecoder;
 
-    public Map<String, Map<String, Object>> make(HttpServletRequest request) {
+    public Map<String, Map<String, Object>> get(HttpServletRequest request) {
         String token = new DefaultBearerTokenResolver().resolve(request);
         log.info("Authorization header token: {}", token);
         Jwt jwt = jwtDecoder.decode(token);

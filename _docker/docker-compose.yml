@@ -3,6 +3,8 @@ services:
   keycloak:
     image: jboss/keycloak:16.1.1
     container_name: keycloak-local
+    networks:
+      - keycloak-ldap
     environment:
       # через эти две системные переменные задаем учетку админа в кейклоке
       KEYCLOAK_USER: 'admin'
@@ -11,13 +13,26 @@ services:
       DB_VENDOR: 'h2'
       # пароль для ключа tls.key, сгенерированного через keycloak_certs_and_truststore_generator.sh
       # будет использоваться кейклоком как пароль от
-      # /opt/jboss/keycloak/standalone/configuration/keystores/https-keystore.jks, который он сгенерит из ключа и серта
-      SERVER_KEYSTORE_PASSWORD: 'keycloak-password'
+      # /opt/jboss/keycloak/standalone/configuration/keystores/https-keystore.jks, который он сгенерит из
+      # самоподписанных ключа tls.key и серта tks.crt
+#      SERVER_KEYSTORE_PASSWORD: 'keycloak-password'
       KEYCLOAK_LOGLEVEL: "INFO"
       KEYCLOAK_IMPORT: "/tmp/example-realm.json"
     volumes:
-      - ./imports/keycloak/tls.crt:/etc/x509/https/tls.crt
-      - ./imports/keycloak/tls.key:/etc/x509/https/tls.key
+#      - ./imports/keycloak/tls.crt:/etc/x509/https/tls.crt
+#      - ./imports/keycloak/tls.key:/etc/x509/https/tls.key
       - ./imports/keycloak/realm-config.json:/tmp/example-realm.json
     ports:
-      - "8443:8443"
+      - "8080:8080"
+
+  openldap:
+    image: rroemhild/test-openldap
+    container_name: ldap-local
+    networks:
+      - keycloak-ldap
+    ports:
+      - "10389:10389"
+      - "10636:10636"
+
+networks:
+  keycloak-ldap:

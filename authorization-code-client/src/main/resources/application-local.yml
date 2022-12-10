@@ -8,7 +8,7 @@ host: 'localhost'
 
 # This is keycloak from docker-compose.yml
 keycloak:
-  uri: 'https://${host}:8443'
+  uri: 'http://${host}:8080'
   realm: "alfa-skillbox-keycloak"
 spring:
   security:
@@ -43,8 +43,14 @@ spring:
             # а именно установить nonce в ссылке при формировании ${authorization-uri} в DefaultOAuth2AuthorizationRequestResolver
             # и из OAuth2LoginAuthenticationProvider: Section 3.1.2.1 Authentication Request - https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest scope
             # REQUIRED. OpenID Connect requests MUST contain the "openid" scope value
-            scope: 'openid,resource-server-scope'
+            scope: 'openid'
             redirect-uri: 'http://${host}:${server.port}/login/oauth2/code/keycloak'
+
+rest:
+  clients:
+    ac-client:
+      uri: "http://localhost:8083/resource-server/client-token"
+
 
 logging:
   level:

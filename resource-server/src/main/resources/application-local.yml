@@ -3,7 +3,7 @@ server:
   port: 8083
 # This is keycloak from docker-compose.yml
 keycloak:
-  uri: 'https://${host}:8443'
+  uri: 'http://${host}:8080'
   realm: "alfa-skillbox-keycloak"
 spring:
   security:
@@ -16,7 +16,7 @@ clients:
   permit:
     authorities:
       ac-client: "ROLE_resource-server"
-      cc-client: "SCOPE_cc-client-to-resource"
+      cc-client: "SCOPE_resource-server-scope"
 
 logging:
   level:

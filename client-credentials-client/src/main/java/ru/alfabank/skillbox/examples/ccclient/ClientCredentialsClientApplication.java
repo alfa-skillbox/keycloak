@@ -1,4 +1,4 @@
-package ru.alfabank.skillbox.examples.keycloak;
+package ru.alfabank.skillbox.examples.ccclient;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
