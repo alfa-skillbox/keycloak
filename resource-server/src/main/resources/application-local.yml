@@ -15,8 +15,36 @@ spring:
 clients:
   permit:
     authorities:
-      ac-client: "ROLE_resource-server"
-      cc-client: "SCOPE_resource-server-scope"
+      by-realm-role:
+        claim: "realm-roles"
+        prefix: "ROLE_"
+        authority: "authorization-client-realm-role"
+        endpoint: "/resource-server/by-realm-role"
+      by-client-role:
+        claim: "client-roles"
+        prefix: "ROLE_"
+        authority: "client-role"
+        endpoint: "/resource-server/by-client-role"
+      by-clients-default-scope:
+        claim: "scope"
+        prefix: "SCOPE_"
+        authority: "clients-default-scope"
+        endpoint: "/resource-server/by-default-scope"
+      by-clients-optional-scope:
+        claim: "scope"
+        prefix: "SCOPE_"
+        authority: "clients-optional-scope"
+        endpoint: "/resource-server/by-optional-scope"
+      by-user-group:
+        claim: "user-group"
+        prefix: "GROUP_"
+        authority: "ship_crew"
+        endpoint: "/resource-server/by-user-group"
+      by-claim:
+        claim: "user-attribute"
+        prefix: "CLAIM_"
+        authority: "Mutant"
+        endpoint: "/resource-server/by-claim"
 
 logging:
   level:

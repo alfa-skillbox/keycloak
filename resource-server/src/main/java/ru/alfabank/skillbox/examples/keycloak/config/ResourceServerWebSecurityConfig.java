@@ -1,23 +1,25 @@
 package ru.alfabank.skillbox.examples.keycloak.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
-import org.springframework.web.client.RestTemplate;
+import ru.alfabank.skillbox.examples.keycloak.config.authorities.JwtGrantedAuthoritiesConverterDelegator;
+import ru.alfabank.skillbox.examples.keycloak.config.properties.JwtGrantedAuthoritiesProperties;
 
+@Slf4j
 @Configuration
+@EnableConfigurationProperties(JwtGrantedAuthoritiesProperties.class)
+@RequiredArgsConstructor
 public class ResourceServerWebSecurityConfig {
-
-    @Value("${clients.permit.authorities.ac-client}")
-    private String acClientRole;
-    @Value("${clients.permit.authorities.cc-client}")
-    private String ccClientRole;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -25,36 +27,56 @@ public class ResourceServerWebSecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain resourceServerSpringSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain resourceServerSpringSecurityFilterChain(
+            HttpSecurity http,
+            JwtGrantedAuthoritiesProperties authoritiesProperties) throws Exception {
         // @formatter:off
         http
                 // who can come in
                 .requestMatchers(rmConfigurer -> rmConfigurer.antMatchers("/resource-server/**"))
                 .csrf().disable()
-                .authorizeRequests(customizer -> customizer
-                        .antMatchers("/resource-server/client-token").hasAnyAuthority(acClientRole, ccClientRole)
-                        .anyRequest().authenticated())
+                .authorizeRequests(customizer -> authorizeRequestCustomizer(customizer, authoritiesProperties))
                 .exceptionHandling().accessDeniedHandler(new AccessDeniedHandlerImpl())
                 .and()
                 .oauth2ResourceServer()
-                    .jwt()
-                        .jwtAuthenticationConverter(getJwtAuthenticationConverter());
+                .jwt()
+                .jwtAuthenticationConverter(getJwtAuthenticationConverter(authoritiesProperties));
+
         // @formatter:on
         return http.build();
     }
 
-    @Bean
-    public JwtAuthenticationConverter getJwtAuthenticationConverter() {
-        var jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        var jwtAuthorizationConverter = new JwtGrantedAuthoritiesConverterDelegator();
-        jwtAuthorizationConverter.addConverter(new JwtGrantedAuthoritiesConverter());
-        jwtAuthorizationConverter.addConverter(new RoleUserJwtGrantedAuthoritiesConverter());
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtAuthorizationConverter);
-        return jwtAuthenticationConverter;
+    public void authorizeRequestCustomizer(
+            ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry,
+            JwtGrantedAuthoritiesProperties authoritiesProperties) {
+        authoritiesProperties.getAuthorities().forEach((key, authorityProperties) ->
+                registry.antMatchers(authorityProperties.getEndpoint()).hasAuthority(authorityProperties.getAuthority()));
+        registry.anyRequest().denyAll();
     }
 
     @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    public JwtAuthenticationConverter getJwtAuthenticationConverter(
+            JwtGrantedAuthoritiesProperties authoritiesProperties) {
+        var jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        var jwtAuthorizationConverter = new JwtGrantedAuthoritiesConverterDelegator();
+        // add out-of-the-box scope authorities converter
+        jwtAuthorizationConverter.addConverter(new JwtGrantedAuthoritiesConverter());
+
+        authoritiesProperties.getAuthorities().forEach((key, authorityProperties) -> {
+            var prefix = authorityProperties.getPrefix();
+            if ("SCOPE_".equals(prefix)) {
+                // they are already added in pure JwtGrantedAuthoritiesConverter
+                return;
+            }
+            var claim = authorityProperties.getClaim();
+            var authorizationConverter = new JwtGrantedAuthoritiesConverter();
+            authorizationConverter.setAuthoritiesClaimName(claim);
+            authorizationConverter.setAuthorityPrefix(prefix);
+            jwtAuthorizationConverter.addConverter(authorizationConverter);
+            log.info("JwtGrantedAuthoritiesConverter for claim {} with prefix {} was added", claim, prefix);
+        });
+
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtAuthorizationConverter);
+        return jwtAuthenticationConverter;
     }
 }

@@ -1,4 +1,4 @@
-package ru.alfabank.skillbox.examples.keycloak.config;
+package ru.alfabank.skillbox.examples.keycloak.config.authorities;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
@@ -21,12 +21,14 @@ public class JwtGrantedAuthoritiesConverterDelegator implements Converter<Jwt, C
     @Override
     public Collection<GrantedAuthority> convert(Jwt source) {
         Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-        for(Converter<Jwt, Collection<GrantedAuthority>> converter : delegates) {
+        for (Converter<Jwt, Collection<GrantedAuthority>> converter : delegates) {
             Collection<GrantedAuthority> result = converter.convert(source);
             if (result != null) {
+                log.info("Created new Granted Authorities: {}", result);
                 grantedAuthorities.addAll(result);
             }
         }
+        log.info("All Granted Authorities: {}", grantedAuthorities);
         return grantedAuthorities;
     }
 }
