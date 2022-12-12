@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.RefreshTokenOAuth2AuthorizedClientProvider;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
@@ -22,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -39,11 +41,11 @@ public class AuthorizationCodeClientWebSecurityConfig {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/oauth2/**", "/login/**").permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().accessDeniedHandler(new AccessDeniedHandlerImpl())
                 .and()
                 .oauth2Login()
-                .defaultSuccessUrl("/authorization-code-client/invoke")
                 .and()
                 .logout();
         // @formatter:on
@@ -67,7 +69,7 @@ public class AuthorizationCodeClientWebSecurityConfig {
 
         OAuth2AuthorizedClientProvider authorizedClientProvider =
                 OAuth2AuthorizedClientProviderBuilder.builder()
-                        .refreshToken()
+                        .refreshToken(refreshTokenGrantBuilder -> refreshTokenGrantBuilder.clockSkew(Duration.ZERO))
                         .authorizationCode()
                         .build();
 

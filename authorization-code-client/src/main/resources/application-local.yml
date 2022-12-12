@@ -49,7 +49,7 @@ spring:
 rest:
   clients:
     ac-client:
-      uri: "http://localhost:8083/resource-server/client-token"
+      uri: "http://localhost:8083/resource-server/"
 
 
 logging:

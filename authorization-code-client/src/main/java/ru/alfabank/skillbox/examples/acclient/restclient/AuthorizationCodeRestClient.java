@@ -40,10 +40,11 @@ public class AuthorizationCodeRestClient implements RestClient {
 
     public Response invoke(HttpServletRequest request,
                            HttpServletResponse response,
-                           Authentication authentication) {
+                           Authentication authentication,
+                           String path) {
         var accessToken = accessTokenExtractor.getToken(request, response, authentication);
         try {
-            ResponseEntity<Object> resourceResponse = getResponse(accessToken);
+            ResponseEntity<Object> resourceResponse = getResponse(path, accessToken);
             return Response.builder()
                     .status(resourceResponse.getStatusCode().name())
                     .body(resourceResponse.getBody())
@@ -55,7 +56,7 @@ public class AuthorizationCodeRestClient implements RestClient {
             // get new access_token
             accessToken = accessTokenExtractor.getToken(request, response, null);
             // repeat exchange
-            ResponseEntity<Object> resourceResponse = getResponse(accessToken);
+            ResponseEntity<Object> resourceResponse = getResponse(path, accessToken);
             return Response.builder()
                     .status(resourceResponse.getStatusCode().name())
                     .body(resourceResponse.getBody())
@@ -84,9 +85,9 @@ public class AuthorizationCodeRestClient implements RestClient {
         }
     }
 
-    private ResponseEntity<Object> getResponse(String accessToken) {
+    private ResponseEntity<Object> getResponse(String path, String accessToken) {
         return restTemplate.exchange(RequestEntity
-                        .get(URI.create(uri))
+                        .get(URI.create(uri + path))
                         .header(AUTHORIZATION, "Bearer " + accessToken)
                         .accept(MediaType.APPLICATION_JSON).build(),
                 new ParameterizedTypeReference<>() {

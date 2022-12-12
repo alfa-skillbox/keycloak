@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.alfabank.skillbox.examples.acclient.dto.Response;
@@ -21,10 +22,11 @@ public class AuthorizationCodeClientController {
 
     private final AuthorizationCodeRestClient restClient;
 
-    @GetMapping("/invoke")
-    public ResponseEntity<Response> invoke(HttpServletRequest request,
+    @GetMapping("/invoke/{resource-path}")
+    public ResponseEntity<Response> invoke(@PathVariable("resource-path") String path,
+                                           HttpServletRequest request,
                                            HttpServletResponse response,
                                            Authentication authentication) {
-        return ResponseEntity.ok(restClient.invoke(request, response, authentication));
+        return ResponseEntity.ok(restClient.invoke(request, response, authentication, path));
     }
 }

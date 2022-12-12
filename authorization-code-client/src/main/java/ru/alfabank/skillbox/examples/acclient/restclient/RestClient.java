@@ -10,5 +10,6 @@ public interface RestClient {
 
     Response invoke(HttpServletRequest request,
                     HttpServletResponse response,
-                    Authentication authentication);
+                    Authentication authentication,
+                    String path);
 }
