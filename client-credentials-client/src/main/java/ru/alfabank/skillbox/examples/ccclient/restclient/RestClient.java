@@ -4,6 +4,6 @@ import ru.alfabank.skillbox.examples.ccclient.dto.Response;
 
 public interface RestClient {
 
-    Response invoke();
+    Response invoke(String path);
 
 }

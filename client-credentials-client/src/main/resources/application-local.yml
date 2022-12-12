@@ -26,13 +26,13 @@ spring:
             provider: 'keycloak'
             client-id: 'client-credentials-client'
             client-secret: 'client-creds-secret'
-            scope: 'resource-server-scope'
+            scope: 'openid,clients-optional-scope'
             authorization-grant-type: 'client_credentials'
 
 rest:
   clients:
     cc-client:
-      uri: "http://localhost:8083/resource-server/client-token"
+      uri: "http://localhost:8083/resource-server/"
 
 logging:
   level:

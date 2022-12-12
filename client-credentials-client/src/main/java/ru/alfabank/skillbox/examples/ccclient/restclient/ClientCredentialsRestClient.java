@@ -38,11 +38,11 @@ public class ClientCredentialsRestClient implements RestClient {
     private String uri;
 
     @Override
-    public Response invoke() {
+    public Response invoke(String path) {
         String accessToken = accessTokenExtractor.getToken(registrationId, clientId);
         log.info("Access token: {}", accessToken);
         try {
-            ResponseEntity<Object> resourceResponse = getResponse(accessToken);
+            ResponseEntity<Object> resourceResponse = getResponse(path, accessToken);
             return Response.builder()
                     .status(resourceResponse.getStatusCode().name())
                     .body(resourceResponse.getBody())
@@ -54,7 +54,7 @@ public class ClientCredentialsRestClient implements RestClient {
             // get new access_token
             accessToken = accessTokenExtractor.getToken(registrationId, clientId);
             // repeat exchange
-            ResponseEntity<Object> resourceResponse = getResponse(accessToken);
+            ResponseEntity<Object> resourceResponse = getResponse(path, accessToken);
             return Response.builder()
                     .status(resourceResponse.getStatusCode().name())
                     .body(resourceResponse.getBody())
@@ -65,6 +65,7 @@ public class ClientCredentialsRestClient implements RestClient {
                     .build();
         } catch (HttpStatusCodeException hsce) {
             // HTTP 4xx is received
+            log.error("4xx occur! {}", hsce.getLocalizedMessage());
             return Response.builder()
                     .status(INTERNAL_SERVER_ERROR.name())
                     .error(Response.Error.builder()
@@ -74,6 +75,7 @@ public class ClientCredentialsRestClient implements RestClient {
                     .build();
         } catch (RestClientException rce) {
             // Other cases
+            log.error("Some exception occur during rest connection! {}", rce.getLocalizedMessage());
             return Response.builder()
                     .status(INTERNAL_SERVER_ERROR.name())
                     .error(Response.Error.builder()
@@ -83,9 +85,9 @@ public class ClientCredentialsRestClient implements RestClient {
         }
     }
 
-    private ResponseEntity<Object> getResponse(String accessToken) {
+    private ResponseEntity<Object> getResponse(String path, String accessToken) {
         return restTemplate.exchange(RequestEntity
-                        .get(URI.create(uri))
+                        .get(URI.create(uri + path))
                         .header(AUTHORIZATION, "Bearer " + accessToken)
                         .accept(MediaType.APPLICATION_JSON).build(),
                 new ParameterizedTypeReference<>() {

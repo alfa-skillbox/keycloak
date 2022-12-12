@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.alfabank.skillbox.examples.ccclient.dto.Response;
@@ -15,8 +16,8 @@ import ru.alfabank.skillbox.examples.ccclient.restclient.RestClient;
 public class ClientCredentialsClientController {
     private final RestClient ccClient;
 
-    @GetMapping("/invoke")
-    public ResponseEntity<Response> invoke() {
-        return ResponseEntity.ok(ccClient.invoke());
+    @GetMapping("/invoke/{resource-path}")
+    public ResponseEntity<Response> invoke(@PathVariable("resource-path") String path) {
+        return ResponseEntity.ok(ccClient.invoke(path));
     }
 }
