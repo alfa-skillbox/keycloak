@@ -54,7 +54,9 @@ rest:
 
 logging:
   level:
-    org.springframework: debug
+    org.springframework: INFO
+    org.springframework.web.client: DEBUG
+    org.springframework.security.oauth2.client: DEBUG
 
 management:
   endpoints:

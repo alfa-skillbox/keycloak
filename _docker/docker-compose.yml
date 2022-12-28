@@ -11,16 +11,30 @@ services:
       KEYCLOAK_PASSWORD: 'admin'
       # прописываем тип БД кейклока. h2 - sql inmemory database
       DB_VENDOR: 'h2'
+#      DB_ADDR: hostname базы (optional). Только для Postgres можно задавать так host1:5421,host2:5436 или host1,host2:5000
+#      DB_PORT: port базы (optional, по умолчанию берется DB_VENDOR default_port)
+#      DB_DATABASE: имя базы (optional, по умолчанию keycloak).
+#      DB_SCHEMA: наимнование схемы БД, если поддерживается (optional, по умолчанию public в Postgres)
+#      DB_USER: пользователь БД (optional, по умолчанию ``)
+#      DB_USER_FILE: путь к файлу, где взять пользака (альтернатива для DB_USER)
+#      DB_PASSWORD: пароль пользака DB_USER (optional, по умолчанию ``)
+#      DB_PASSWORD_FILE: путь к файлу, где взять пароль пользака DB_USER (альтернатива для DB_PASSWORD)
+
+      # Настройка для HTTPS
       # пароль для ключа tls.key, сгенерированного через keycloak_certs_and_truststore_generator.sh
       # будет использоваться кейклоком как пароль от
       # /opt/jboss/keycloak/standalone/configuration/keystores/https-keystore.jks, который он сгенерит из
       # самоподписанных ключа tls.key и серта tks.crt
 #      SERVER_KEYSTORE_PASSWORD: 'keycloak-password'
       KEYCLOAK_LOGLEVEL: "INFO"
-      KEYCLOAK_IMPORT: "/tmp/example-realm.json"
+
+      # импорт конфигурации реалма
+#      KEYCLOAK_IMPORT: "/tmp/example-realm.json"
     volumes:
+      # Настройка для HTTPS
 #      - ./imports/keycloak/tls.crt:/etc/x509/https/tls.crt
 #      - ./imports/keycloak/tls.key:/etc/x509/https/tls.key
+      # импорт конфигурации реалма
       - ./imports/keycloak/realm-config.json:/tmp/example-realm.json
     ports:
       - "8080:8080"

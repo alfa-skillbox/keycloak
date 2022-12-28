@@ -30,7 +30,7 @@ keytool -keystore $KEYCLOAK.keystore \
         -genkeypair -v
 #keytool -list -v -keystore keycloak.keystore -storepass keycloak-password -alias keycloak-local
 
-# Exports self-signet keycloak-client .pem certificate
+# Exports self-signed keycloak-client .pem certificate
 keytool -keystore $KEYCLOAK.keystore \
         -storepass $KEYCLOAK_KEYSTORE_PASSWORD \
         -alias $KEYCLOAK_KEYSTORE_ALIAS \
