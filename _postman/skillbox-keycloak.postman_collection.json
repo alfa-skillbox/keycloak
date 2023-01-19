@@ -1,0 +1,401 @@
+{
+	"info": {
+		"_postman_id": "abdac31a-8499-4cc1-b98a-dfceac8f088f",
+		"name": "skillbox-keycloak",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "keycloak",
+			"item": [
+				{
+					"name": "authoization_code_flow",
+					"item": [
+						{
+							"name": "authorize",
+							"protocolProfileBehavior": {
+								"strictSSL": false
+							},
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "scope",
+											"value": "resource-server-scope cc-client-to-resource",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "{{keycloak}}/auth/realms/{{realm}}/protocol/openid-connect/auth",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "{{keycloak}}/auth/realms/{{realm}}/protocol/openid-connect/token",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "ac-client-token",
+											"type": "string"
+										},
+										{
+											"key": "tokenType",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "accessToken",
+											"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI4aTJRbldVTUVEMUNDTVdBUVZrOVZlNXpxU1FhMkJNQWtpTjFYXzhQZmhRIn0.eyJleHAiOjE2Njk2NTMxMzAsImlhdCI6MTY2OTY1MjgzMCwiYXV0aF90aW1lIjoxNjY5NjUyODI5LCJqdGkiOiI2MWUyMjRlNC1lNjM2LTQ1ZjAtYjVmNy1hMjMwMzE5NTc3MTQiLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo4NDQzL2F1dGgvcmVhbG1zL2FsZmEtc2tpbGxib3gta2V5Y2xvYWsiLCJzdWIiOiJiMjgzNmNiNy1iYTdjLTQ5YjYtYTllYS1iYmY3YjgxZWUwNDciLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhdXRob3JpemF0aW9uLWNvZGUtY2xpZW50Iiwic2Vzc2lvbl9zdGF0ZSI6IjllMTJiYjk2LTdjYzktNDJmMS1hMDU3LTYzZjc3MWM2MDkzMSIsImFjciI6IjEiLCJyZXNvdXJjZV9hY2Nlc3MiOnsiYXV0aG9yaXphdGlvbi1jb2RlLWNsaWVudCI6eyJyb2xlcyI6WyJyZXNvdXJjZS1zZXJ2ZXIiXX19LCJzY29wZSI6InJlc291cmNlLXNlcnZlci1zY29wZSIsInNpZCI6IjllMTJiYjk2LTdjYzktNDJmMS1hMDU3LTYzZjc3MWM2MDkzMSJ9.eqeXTPD1yoSEbQ8omdkzBqWBDgTMkRYHRiBdWlUw7E49I48nQVBkKbYkn6xzjozde6aRzelJd7jla1tJeviQGeVC_w9m85U9i_g02-IC4fp9PJEFfzqiqsu4B0QTWsTUpOQmNLhgaYesoKGfltRf28gHK7A-ILbnP29CSu25vxs5-o44GTIdsJHgTsiPZiubKA5U7D2RcaAnkzj-MlhXNfUTh6PmJY6LbcJRHNIpypXrDMpEAupSknF8TbgFmoy8KEYpbZIucVzL0LHJe02tNubAxIjOMNqsiDjo-4tDEi86a-Uz3hQ7MZoi8685oPKsrtS2iDV9U0LHwB1sRaSvTA",
+											"type": "string"
+										},
+										{
+											"key": "redirect_uri",
+											"value": "{{authorization_code_host}}/login/oauth2/code/keycloak",
+											"type": "string"
+										},
+										{
+											"key": "useBrowser",
+											"value": false,
+											"type": "boolean"
+										},
+										{
+											"key": "client_authentication",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "auth-code-secret",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "authorization-code-client",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "authorization_code",
+											"type": "string"
+										},
+										{
+											"key": "state",
+											"value": "state",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{resource_server}}/resource-server/request-headers",
+									"host": [
+										"{{resource_server}}"
+									],
+									"path": [
+										"resource-server",
+										"request-headers"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "client_credentials_flow",
+					"item": [
+						{
+							"name": "step 1. get token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"  //parse the response JSON and test three properties",
+											"    const responseJson = pm.response.json();",
+											"    pm.environment.set(\"cc-client-token\", responseJson.access_token);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"strictSSL": false
+							},
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "username",
+											"value": "client-credentials-client",
+											"type": "string"
+										},
+										{
+											"key": "password",
+											"value": "client-creds-secret",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "text"
+										},
+										{
+											"key": "scope",
+											"value": "cc-client-to-resource",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{keycloak}}/auth/realms/{{realm}}/protocol/openid-connect/token",
+									"host": [
+										"{{keycloak}}"
+									],
+									"path": [
+										"auth",
+										"realms",
+										"{{realm}}",
+										"protocol",
+										"openid-connect",
+										"token"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "step 2. use token with resource-server",
+							"protocolProfileBehavior": {
+								"strictSSL": false
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{cc-client-token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{resource_server}}/resource-server/client-token",
+									"host": [
+										"{{resource_server}}"
+									],
+									"path": [
+										"resource-server",
+										"client-token"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "jwk-set-uri",
+							"protocolProfileBehavior": {
+								"strictSSL": false
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{keycloak}}/auth/realms/alfa-skillbox-keycloak/protocol/openid-connect/certs",
+									"host": [
+										"{{keycloak}}"
+									],
+									"path": [
+										"auth",
+										"realms",
+										"alfa-skillbox-keycloak",
+										"protocol",
+										"openid-connect",
+										"certs"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "client credentials client",
+			"item": [
+				{
+					"name": "cc-invoke-by-realm-role",
+					"protocolProfileBehavior": {
+						"strictSSL": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{client_credentials_host}}/client-credentials-client/invoke/by-realm-role",
+							"host": [
+								"{{client_credentials_host}}"
+							],
+							"path": [
+								"client-credentials-client",
+								"invoke",
+								"by-realm-role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cc-invoke-by-client-role",
+					"protocolProfileBehavior": {
+						"strictSSL": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{client_credentials_host}}/client-credentials-client/invoke/by-client-role",
+							"host": [
+								"{{client_credentials_host}}"
+							],
+							"path": [
+								"client-credentials-client",
+								"invoke",
+								"by-client-role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cc-invoke-by-clients-default-scope",
+					"protocolProfileBehavior": {
+						"strictSSL": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{client_credentials_host}}/client-credentials-client/invoke/by-default-scope",
+							"host": [
+								"{{client_credentials_host}}"
+							],
+							"path": [
+								"client-credentials-client",
+								"invoke",
+								"by-default-scope"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cc-invoke-by-clients-optional-scope",
+					"protocolProfileBehavior": {
+						"strictSSL": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{client_credentials_host}}/client-credentials-client/invoke/by-optional-scope",
+							"host": [
+								"{{client_credentials_host}}"
+							],
+							"path": [
+								"client-credentials-client",
+								"invoke",
+								"by-optional-scope"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "authorization code client",
+			"item": [
+				{
+					"name": "ac-invoke-by-realm-role",
+					"protocolProfileBehavior": {
+						"strictSSL": false,
+						"followRedirects": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{authorization_code_host}}/authorization-code-client/invoke/by-realm-role",
+							"host": [
+								"{{authorization_code_host}}"
+							],
+							"path": [
+								"authorization-code-client",
+								"invoke",
+								"by-realm-role"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "cc_client",
+			"value": "client_credentials_client"
+		},
+		{
+			"key": "cc_client_psswd",
+			"value": "CeCdMsVRRWjUKobxGtvH1mnc0PR08esW"
+		},
+		{
+			"key": "cc_client_psswd",
+			"value": ""
+		},
+		{
+			"key": "cc-client-token",
+			"value": ""
+		}
+	]
+}
